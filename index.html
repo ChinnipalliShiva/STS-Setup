@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS MFA Authentication Script Documentation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, #3498db, #2c3e50);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #34495e;
+            border-left: 5px solid #3498db;
+            padding-left: 15px;
+            margin-top: 30px;
+            font-size: 1.5em;
+            background: linear-gradient(90deg, #ecf0f1, transparent);
+            padding: 10px 15px;
+            border-radius: 5px;
+        }
+
+        h3 {
+            color: #2980b9;
+            margin-top: 25px;
+            font-size: 1.3em;
+        }
+
+        p,
+        li {
+            color: #2c3e50;
+            font-size: 1.1em;
+        }
+
+        .code-block {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            line-height: 1.4;
+            margin: 15px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            overflow-x: auto;
+            border-left: 5px solid #3498db;
+        }
+
+        .inline-code {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .highlight {
+            background: linear-gradient(45deg, #f39c12, #e67e22);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        ul,
+        ol {
+            margin: 15px 0;
+        }
+
+        li {
+            margin: 8px 0;
+            padding-left: 5px;
+        }
+
+        .important-note {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, #fd79a8, #e84393);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .bash-script {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: #fff;
+            padding: 25px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+            margin: 20px 0;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            border-left: 5px solid #00cec9;
+            overflow-x: auto;
+        }
+
+        .command {
+            color: #a8e6cf;
+        }
+
+        .string {
+            color: #ffd93d;
+        }
+
+        .variable {
+            color: #ff6b6b;
+        }
+
+        .comment {
+            color: #95a5a6;
+            font-style: italic;
+        }
+
+        .keyword {
+            color: #74b9ff;
+            font-weight: bold;
+        }
+
+        .step-number {
+            background: linear-gradient(45deg, #6c5ce7, #a29bfe);
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .code-group {
+            margin-bottom: 16px;
+            /* Adds space between blocks */
+        }
+
+        .code-group div {
+            white-space: pre;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🔐 AWS MFA Authentication Script Documentation</h1>
+
+        <h2>📋 Prerequisites</h2>
+        <p>AWS credentials file (<span class="inline-code">~/.aws/credentials</span>) must be configured with:</p>
+        <ul>
+            <li>Your AWS profile credentials</li>
+            <li>MFA ARN configuration</li>
+        </ul>
+
+        <h3>Example credentials file structure:</h3>
+        <div class="code-block">
+            <div class="code-group">
+                <div>[your_profile]</div>
+                <div>aws_access_key_id = YOUR_ACCESS_KEY</div>
+                <div>aws_secret_access_key = YOUR_SECRET_KEY</div>
+            </div>
+
+            <div class="code-group">
+                <div>[your_profile_mfa_arn]</div>
+                <div>mfa = arn:aws:iam::ACCOUNT_ID:mfa/USER</div>
+            </div>
+
+            <div class="code-group">
+                <div># For multiple profiles:</div>
+                <div>[another_profile]</div>
+                <div>aws_access_key_id = ANOTHER_ACCESS_KEY</div>
+                <div>aws_secret_access_key = ANOTHER_SECRET_KEY</div>
+            </div>
+
+            <div class="code-group">
+                <div>[another_profile_mfa_arn]</div>
+                <div>mfa = arn:aws:iam::ANOTHER_ACCOUNT_ID:mfa/ANOTHER_USER</div>
+            </div>
+        </div>
+
+        <h2>📥 Inputs and Error Handling</h2>
+        <div class="info-box">
+            <strong>The script requires the following inputs:</strong>
+            <ol>
+                <li><span class="highlight">Profile Name</span>: Your AWS profile name as configured in credentials file
+                </li>
+                <li><span class="highlight">MFA Code</span>: 6-digit MFA token from your authenticator device</li>
+            </ol>
+        </div>
+
+        <p><strong>Error checks include:</strong></p>
+        <ul>
+            <li>Verification of AWS credentials file existence</li>
+            <li>Validation of MFA ARN configuration</li>
+            <li>MFA code format validation (must be 6 digits)</li>
+            <li>AWS session token generation validation</li>
+            <li>JSON response parsing verification</li>
+        </ul>
+
+        <h2>🚀 How to Run</h2>
+        <div class="success-box">
+            <p><span class="step-number">1</span>Double-click the script file <span
+                    class="inline-code">file_name.sh</span>, or</p>
+            <p><span class="step-number">2</span>Run from terminal:</p>
+            <div class="code-block">./file_name.sh</div>
+        </div>
+
+        <h2>⚠️ Important Notes</h2>
+        <div class="warning-box">
+            <ul>
+                <li><strong>Default Credentials Path</strong>: The script looks for credentials at <span
+                        class="inline-code">$HOME/.aws/credentials</span></li>
+                <li>If your credentials file is in a different location, modify this line in the script:<br>
+                    <span class="inline-code">aws_credentials_file="$HOME/.aws/credentials"</span>
+                </li>
+                <li>The script will create/update the <span class="inline-code">[default]</span> profile with temporary
+                    credentials</li>
+                <li>A new shell session will start automatically after successful execution</li>
+                <li>Temporary files are automatically cleaned up on script exit</li>
+            </ul>
+        </div>
+
+        <h2>💻 Script Code</h2>
+        <div class="bash-script">
+            <span class="command">read</span> <span class="string">-p "Enter Profile Name : "</span> <span
+                class="variable">profile_name</span><br>
+            <span class="keyword">export</span> <span class="variable">AWS_PROFILE</span>=<span
+                class="variable">$profile_name</span><br>
+            <span class="variable">aws_credentials_file</span>=<span class="string">"$HOME/.aws/credentials"</span><br>
+            <span class="variable">temp_file</span>=<span class="string">"temp.json"</span><br>
+            <br>
+            <span class="comment"># Cleanup temp file on exit</span><br>
+            <span class="keyword">trap</span> <span class="string">"rm -f $temp_file"</span> <span
+                class="keyword">EXIT</span><br>
+            <br>
+            <span class="comment"># Check if AWS credentials file exists</span><br>
+            <span class="keyword">if</span> [ ! -f <span class="string">"$aws_credentials_file"</span> ]; <span
+                class="keyword">then</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="command">echo</span> <span class="string">"Error: AWS credentials file
+                not found."</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">exec</span> <span class="command">bash</span><br>
+            <span class="keyword">fi</span><br>
+            <span class="command">echo</span> <span class="string">"Found credentials file."</span><br>
+            <span class="command">sed</span> <span class="string">-i '/\[default\]/,/^$/d'</span> <span
+                class="string">"$aws_credentials_file"</span><br>
+            <br>
+            <span class="comment"># Extract MFA ARN</span><br>
+            <span class="variable">mfa_arn</span>=$(<span class="command">awk</span> <span class="string">-v
+                profile="$profile_name" '/\[.+_mfa_arn\]/{if ($0 ~ "\\["profile"_mfa_arn\\]") {getline; print}}'</span>
+            <span class="string">"$aws_credentials_file"</span> | <span class="command">cut</span> <span
+                class="string">-d'=' -f2</span> | <span class="command">xargs</span>)<br>
+            <span class="keyword">if</span> [ -z <span class="string">"$mfa_arn"</span> ]; <span
+                class="keyword">then</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="command">echo</span> <span class="string">"Error: MFA ARN not found in
+                credentials file."</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">exec</span> <span class="command">bash</span><br>
+            <span class="keyword">fi</span><br>
+            <span class="command">echo</span> <span class="string">"MFA ARN: found in credentials file."</span><br>
+            <br>
+            <span class="comment"># Prompt for user input and validate</span><br>
+            <span class="keyword">while</span> <span class="keyword">true</span>; <span class="keyword">do</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="command">read</span> <span class="string">-p "Enter 6-digit MFA Code:
+                "</span> <span class="variable">mfa_code</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span> [[ <span class="string">"$mfa_code"</span> =~
+            ^[0-9]{6}$ ]]; <span class="keyword">then</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">break</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">else</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="command">echo</span> <span
+                class="string">"Error: MFA Code must be exactly 6 digits."</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">fi</span><br>
+            <span class="keyword">done</span><br>
+            <br>
+            <span class="comment"># Validate input</span><br>
+            <span class="keyword">if</span> [ -z <span class="string">"$mfa_code"</span> ]; <span
+                class="keyword">then</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="command">echo</span> <span class="string">"Error: MFA Code are
+                required."</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">exec</span> <span class="command">bash</span><br>
+            <span class="keyword">fi</span><br>
+            <br>
+            <span class="comment"># Get session token</span><br>
+            <span class="command">aws sts get-session-token</span> <span class="string">--serial-number
+                "$mfa_arn"</span> <span class="string">--token-code "$mfa_code"</span> ><span
+                class="string">"$temp_file"</span><br>
+            <br>
+            <span class="keyword">if</span> [ $? -ne 0 ]; <span class="keyword">then</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="command">echo</span> <span class="string">"Error: Failed to get session
+                token."</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">exec</span> <span class="command">bash</span><br>
+            <span class="keyword">fi</span><br>
+            <br>
+            <span class="comment"># Extract credentials</span><br>
+            <span class="variable">aws_access_key_id</span>=$(<span class="command">awk</span> <span
+                class="string">-F'"' '/AccessKeyId/{print $4}'</span> <span class="string">"$temp_file"</span>)<br>
+            <span class="variable">aws_secret_access_key</span>=$(<span class="command">awk</span> <span
+                class="string">-F'"' '/SecretAccessKey/{print $4}'</span> <span class="string">"$temp_file"</span>)<br>
+            <span class="variable">aws_session_token</span>=$(<span class="command">awk</span> <span
+                class="string">-F'"' '/SessionToken/{print $4}'</span> <span class="string">"$temp_file"</span>)<br>
+            <br>
+            <span class="keyword">if</span> [ -z <span class="string">"$aws_access_key_id"</span> ] || [ -z <span
+                class="string">"$aws_secret_access_key"</span> ] || [ -z <span
+                class="string">"$aws_session_token"</span> ]; <span class="keyword">then</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="command">echo</span> <span class="string">"Error: Failed to parse JSON
+                response."</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">exec</span> <span class="command">bash</span><br>
+            <span class="keyword">fi</span><br>
+            <br>
+            <span class="comment"># Update AWS credentials file</span><br>
+            <span class="command">sed</span> <span class="string">-i '/\[default\]/q'</span> <span
+                class="string">"$aws_credentials_file"</span><br>
+            {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="command">echo</span> <span class="string">-e "\n\n[default]"</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="command">echo</span> <span class="string">"aws_access_key_id =
+                $aws_access_key_id"</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="command">echo</span> <span class="string">"aws_secret_access_key =
+                $aws_secret_access_key"</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="command">echo</span> <span class="string">"aws_session_token =
+                $aws_session_token"</span><br>
+            } >><span class="string">"$aws_credentials_file"</span><br>
+            <span class="command">echo</span> <span class="string">"Temporary credentials added under [default]
+                profile."</span><br>
+            <br>
+            <span class="comment"># Replace the read command with this</span><br>
+            <span class="command">echo</span> <span class="string">"Script completed. Starting new shell..."</span><br>
+            <br>
+            <span class="command">echo</span> <span class="string">-n "Exiting in: "</span><br>
+            <span class="keyword">for</span> <span class="variable">i</span> <span class="keyword">in</span> {10..1};
+            <span class="keyword">do</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="command">echo</span> <span class="string">-n "$i "</span><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="command">sleep</span> 1<br>
+            <span class="keyword">done</span><br>
+            <span class="command">echo</span> <span class="string">-e "\nBye!"</span><br>
+            <span class="keyword">exit</span> 0
+        </div>
+
+
+    </div>
+</body>
+
+</html>
